@@ -9,6 +9,14 @@ fun main() {
         Pouring coffee into the cup
         Pouring some milk into the cup
         Coffee is ready!
-        """.trimIndent()
-    )
+    """.trimIndent())
+
+    print("Write how many cups of coffee you will need: ")
+    val cupCount = readln().toInt()
+    print("""
+        For $cupCount cups of coffee you will need:
+        ${cupCount * 200} ml of water
+        ${cupCount * 50} ml of milk
+        ${cupCount * 15} g of coffee beans
+    """.trimIndent())
 }
