@@ -17,6 +17,8 @@ const val CAPPUCCINO_COST = 6
 const val BUY = "buy"
 const val FILL = "fill"
 const val TAKE = "take"
+const val REMAINING = "remaining"
+const val EXIT = "exit"
 
 var MACHINE_HAS_WATER = 400
 var MACHINE_HAS_MILK = 540
@@ -40,66 +42,46 @@ fun state() {
 }
 
 fun chooseAction() {
-    state()
-
-    print("Write action ($BUY, $FILL, $TAKE): ")
-    when (readln()) {
-        BUY -> buyCoffee()
-        FILL -> fillCoffeeMachine()
-        TAKE -> takeMoney()
-        else -> println("Unknown Action")
+    while (true) {
+        print("Write action ($BUY, $FILL, $TAKE. $REMAINING, $EXIT): ")
+        when (readln()) {
+            BUY -> buyCoffee()
+            FILL -> fillCoffeeMachine()
+            TAKE -> takeMoney()
+            REMAINING -> state()
+            EXIT -> break
+            else -> println("Unknown Action")
+        }
     }
-
-    state()
 }
 
 fun buyCoffee() {
-    println("What do you want to buy? 1 - espresso, 2 - latte, 3 - cappuccino: ")
-    when (readln().toInt()) {
-        1 -> makeEspresso()
-        2 -> makeLatte()
-        3 -> makeCappuccino()
+    println("What do you want to buy? 1 - espresso, 2 - latte, 3 - cappuccino, back - to main menu: ")
+    when (readln()) {
+        "1" -> makeCoffee(ESPRESSO_WATER, 0, ESPRESSO_COFFEE_BEANS, ESPRESSO_COST)
+        "2" -> makeCoffee(LATTE_WATER, LATTE_MILK, LATTE_COFFEE_BEANS, LATTE_COST)
+        "3" -> makeCoffee(CAPPUCCINO_WATER, CAPPUCCINO_MILK, CAPPUCCINO_COFFEE_BEANS, CAPPUCCINO_COST)
+        "back" -> {} // ignore
         else -> println("Unknown drink")
     }
 }
 
-fun makeEspresso() {
-    if (ESPRESSO_WATER <= MACHINE_HAS_WATER
-        && ESPRESSO_COFFEE_BEANS <= MACHINE_HAS_COFFEE_BEANS
-        && 0 < MACHINE_HAS_CUP)
-    {
-        MACHINE_HAS_WATER -= ESPRESSO_WATER
-        MACHINE_HAS_COFFEE_BEANS -= ESPRESSO_COFFEE_BEANS
+fun makeCoffee(water: Int, milk: Int, coffeeBeans: Int, cost: Int) {
+    if (MACHINE_HAS_WATER < water) {
+        println("Sorry, not enough water!")
+    } else if (MACHINE_HAS_MILK < milk) {
+        println("Sorry, not enough milk!")
+    } else if (MACHINE_HAS_COFFEE_BEANS < coffeeBeans) {
+        println("Sorry, not enough coffee beans!")
+    } else if (MACHINE_HAS_CUP <= 0) {
+        println("Sorry, not enough disposable cups!")
+    } else {
+        println("I have enough resources, making you a coffee!")
+        MACHINE_HAS_WATER -= water
+        MACHINE_HAS_MILK -= milk
+        MACHINE_HAS_COFFEE_BEANS -= coffeeBeans
         MACHINE_HAS_CUP--
-        MACHINE_HAS_MONEY += ESPRESSO_COST
-    }
-}
-
-fun makeLatte() {
-    if (LATTE_WATER <= MACHINE_HAS_WATER
-        && LATTE_MILK <= MACHINE_HAS_MILK
-        && LATTE_COFFEE_BEANS <= MACHINE_HAS_COFFEE_BEANS
-        && 0 < MACHINE_HAS_CUP)
-    {
-        MACHINE_HAS_WATER -= LATTE_WATER
-        MACHINE_HAS_MILK -= LATTE_MILK
-        MACHINE_HAS_COFFEE_BEANS -= LATTE_COFFEE_BEANS
-        MACHINE_HAS_CUP--
-        MACHINE_HAS_MONEY += LATTE_COST
-    }
-}
-
-fun makeCappuccino() {
-    if (CAPPUCCINO_WATER <= MACHINE_HAS_WATER
-        && CAPPUCCINO_MILK <= MACHINE_HAS_MILK
-        && CAPPUCCINO_COFFEE_BEANS <= MACHINE_HAS_COFFEE_BEANS
-        && 0 < MACHINE_HAS_CUP)
-    {
-        MACHINE_HAS_WATER -= CAPPUCCINO_WATER
-        MACHINE_HAS_MILK -= CAPPUCCINO_MILK
-        MACHINE_HAS_COFFEE_BEANS -= CAPPUCCINO_COFFEE_BEANS
-        MACHINE_HAS_CUP--
-        MACHINE_HAS_MONEY += CAPPUCCINO_COST
+        MACHINE_HAS_MONEY += cost
     }
 }
 
